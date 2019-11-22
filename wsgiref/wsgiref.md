@@ -21,29 +21,3 @@
  6. wsgi app 将reponse header/status/body 回传给wsgi handler
  7. 最终handler还是通过socket将response信息塞回给客户端。
 *![在这里插入图片描述](https://img-blog.csdnimg.cn/20190507161342283.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzgyOTYzMw==,size_16,color_FFFFFF,t_70)
-```python
-def demo_app(environ, start_response):
-    from StringIO import StringIO
-    stdout = StringIO()
-    print(>>stdout, "Hello world!")
-    print(>>stdout)
-    h = environ.items()
-    h.sort()
-    for k, v in h:
-        print(>>stdout, k, '=', repr(v))
-    start_response("200 OK", [('Content-Type', 'text/plain')])
-    return [stdout.getvalue()]
-
-
-def make_server(
-    host, port, app, server_class=WSGIServer, handler_class=WSGIRequestHandler
-):
-    """Create a new WSGI server listening on `host` and `port` for `app`"""
-    server = server_class((host, port), handler_class)
-    server.set_app(app)
-    return server
-
-
-httpd = make_server('localhost', 8002,  demo_app)
-httpd.serve_forever()  # 使用select
-```
