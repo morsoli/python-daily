@@ -7,8 +7,8 @@ RUN sed -i 's@http://archive.ubuntu.com/ubuntu/@http://mirrors.aliyun.com/ubuntu
 RUN mkdir -p /root/demo
 WORKDIR /root/demo
 
-#COPY requirements.txt requirements.txt
-#COPY . /root/directory
+COPY requirements.txt requirements.txt
+COPY . /root/demo
 
 
 RUN apt-get clean && \
@@ -19,5 +19,5 @@ RUN apt-get clean && \
     && apt-get autoclean \
     && ln -sf /usr/bin/pip3 /usr/bin/pip && ln -sf /usr/bin/python3 /usr/bin/python
 
-# pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-# ENTRYPOINT [ "/root/demo/docker_init.sh" ] # 执行shell脚本
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+# ENTRYPOINT ["python", "demo/generatevideo.py"] # 执行python脚本

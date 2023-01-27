@@ -1,12 +1,13 @@
-from moviepy.editor import VideoFileClip
-from pathlib import Path
+# -*- coding: UTF-8 -*-
+
 import os
-import speech_recognition as sr
-from pydub import AudioSegment
 import wave
 import contextlib
 import datetime
 from pydub.silence import split_on_silence
+from moviepy.editor import AudioFileClip
+import speech_recognition as sr
+from pydub import AudioSegment
 
 
 def get_audio_duration(file):
@@ -52,6 +53,7 @@ def get_large_audio_transcription(recognizer,path):
             audio_listened = recognizer.record(source)
             # try converting it to text
             try:
+                # 中文识别
                 text = recognizer.recognize_google(audio_listened,language="zh-CN")
             except sr.UnknownValueError as e:
                 print("Error:", str(e))
@@ -63,18 +65,14 @@ def get_large_audio_transcription(recognizer,path):
                 time_lines.append(start_time)
         duration = get_audio_duration(chunk_filename)
         start_time += datetime.timedelta(seconds=duration)
-    # return the text for all chunks detected
     return whole_text,time_lines
 
-
-if __name__ == "__main__":
-    video_file = Path('test.mp4')
-    file_name = video_file.stem
-    audio_file = f'{file_name}.wav'
-    video_clip = VideoFileClip(str(video_file))
-    video_clip.audio.write_audiofile(audio_file)
+def video2text():
+    audio_file = "./test.wav"
     r = sr.Recognizer()
     whole_text,time_lines = get_large_audio_transcription(r,audio_file)
     for t,txt in zip(time_lines,whole_text):
         print(f'{t.time()}: {txt}')
 
+if __name__ == "__main__":
+    video2text()
