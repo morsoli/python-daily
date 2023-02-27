@@ -58,7 +58,7 @@ class CommonGernerateVideo(object):
     def __init__(self, video_name, video_formt="mp4v" ,fps=0.5) -> None:
         self.video_name = video_name
         self.fps = fps
-        self.video_size = (1920, 1080)
+        self.video_size = (6720, 6720)
         self.image_path = "./images/"
         self.audio_path = "./audios/"
         self.video_tmp = "./videos/{}.mp4".format(video_name+"_tmp")
@@ -125,8 +125,8 @@ def init_path():
 
 def generate_video():
     # https://www.pexels.com/zh-cn/collections/feeling-happy-hzn4cx4/
-    pexels_collections_id = "hzn4cx4"
-    video_name = "The Best Time"
+    pexels_collections_id = "x2gadw0"
+    video_name = "smile"
 
     # https://www.fiftysounds.com/music/the-best-time.zip
     audio_name = "The Best Time.mp3"
