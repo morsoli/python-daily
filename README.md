@@ -10,3 +10,4 @@
 #### 1. [自动生成视频](./mediaprocess/generatevideo.py)
 #### 2. [音频提取字幕](./mediaprocess/audio2text.py)
 #### 3. [音频内容相似性搜索](./embeddings/sbert-base-chinese-nli.py)
+#### 4. [自定义内容生成QA机器人](./chat/)
