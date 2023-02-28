@@ -12,4 +12,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE 9000
 
-ENTRYPOINT ["uvicorn", "boot:app", "--reload"]
+ENTRYPOINT ["uvicorn", "main:app", "--reload"]
