@@ -17,7 +17,6 @@ RUN apt-get clean && \
     python3 python3-dev python3-pip libpcre3 libpcre3-dev  uwsgi-plugin-python3 \
     && apt-get clean \
     && apt-get autoclean \
-    && ln -sf /usr/bin/pip3 /usr/bin/pip && ln -sf /usr/bin/python3 /usr/bin/python
-
-pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+    && ln -sf /usr/bin/pip3 /usr/bin/pip && ln -sf /usr/bin/python3 /usr/bin/python \
+    && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 # ENTRYPOINT ["python", "demo/generatevideo.py"] # 执行python脚本
