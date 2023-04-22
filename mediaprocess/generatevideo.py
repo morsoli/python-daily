@@ -5,6 +5,7 @@ import json
 import sys
 import cv2
 import requests
+from urllib.parse import urlencode
 from tqdm import tqdm
 from moviepy.editor import VideoFileClip, concatenate_videoclips
 from moviepy.editor import AudioFileClip, concatenate_audioclips
@@ -25,10 +26,10 @@ class SingletonClass(object):
   
 class VideoRestClient(SingletonClass):
     def _get(self, url, params):
-        full_url = self.base_url + url
-        response = requests.get(url=full_url,params=params,headers=self.headers,verify=False,timeout=self.timeout)
+        full_url = self.base_url + url + "?" + urlencode(params)
+        response = requests.get(url=full_url, headers=self.headers,verify=False,timeout=self.timeout)
         if response.status_code != 200:
-            print("Pexels response error: {}".format(response.status_code))
+            print("url {} response error: {}".format(full_url, response.status_code))
             return
         response_data = json.loads(response.text)
         return response_data
@@ -78,28 +79,55 @@ class CoverrRestClient(VideoRestClient):
     def __init__(self) -> None:
         self.timeout = 30
         self.base_url = "https://api.coverr.co"
-        self.headers = {
-            "Authorization": "Bearer {}".format(COVERR_API_KEY)
-        }
+        self.headers = None
+    
+    def get_video_url(self, video):
+        video_id = video.get("video_id")
+        if not video_id:
+            return
+        if video.get("max_width") == 1920 and video.get("max_height") == 1080:
+            res = self._get("/videos/{}".format(video_id), {"api_key": COVERR_API_KEY})
+            if res.get("urls"):
+                return res.get("urls").get("mp4_download")
+
     # https://api.coverr.co/docs/videos/#search-videos
     def search_videos(self, query_string):
         url = "/videos"
         params = {
+            "api_key": COVERR_API_KEY,
             "query": query_string,
             "page_size": 20
         }
         collections = self._get(url, params)
         if not collections:
             return
-        print(collections)
+        media = collections.get("hits")
+        if not media:
+            return
+        videos = []
+        for item in media:
+            original_url = self.get_video_url(item)
+            print(original_url)
+            videos.append(original_url)
+        return videos
         
 
 class PixabayRestClient(VideoRestClient):
     def __init__(self) -> None:
         self.timeout = 30
         self.base_url = "https://pixabay.com/api/"
-        self.api_key = PEXELS_API_KEY
+        self.api_key = PIXABAY_API_KEY
         self.headers = None
+        
+    def get_video_url(self, video):
+        video_files = video.get("videos")
+        if not video_files:
+            return
+        for k, v in video_files.items():
+            if v.get("width") == 1920 and v.get("height") == 1080:
+                res = requests.get(v.get("url"), allow_redirects=True, timeout=self.timeout)
+                if res.status_code == 200:    
+                    return res.url
 
     # https://pixabay.com/api/docs/#api_key
     def search_videos(self, query_string):
@@ -113,7 +141,15 @@ class PixabayRestClient(VideoRestClient):
         collections = self._get(url, params)
         if not collections:
             return
-        print(collections)
+        media = collections.get("hits")
+        if not media:
+            return
+        videos = []
+        for item in media:
+            original_url = self.get_video_url(item)
+            print(original_url)
+            videos.append(original_url)
+        return videos
 
 
 class CommonGernerateVideo(object):
@@ -176,6 +212,7 @@ class CommonGernerateVideo(object):
         concatenated_clip = concatenate_audioclips(audio_files)
         # 将结果写入新的音频文件
         concatenated_clip.write_audiofile(self.audio_tmp)
+        concatenated_clip.close()
         return True
     
     def concatenate_video(self):
@@ -184,17 +221,22 @@ class CommonGernerateVideo(object):
             video_file= os.path.join(self.video_path, filename)
             if not video_file.endswith('.mp4'):
                 continue
-            # 加载每个视频文件并创建VideoFileClip对象
-            video_files.append(VideoFileClip(video_file))
+            try:
+                # 加载每个视频文件并创建VideoFileClip对象
+                video_files.append(VideoFileClip(video_file))
+            except Exception as e:
+                print(e)
+                continue
         # 使用concatenate_videoclips函数拼接音频文件
         concatenated_clip = concatenate_videoclips(video_files)
         # 将结果写入新的视频文件
         concatenated_clip.write_videofile(self.video_tmp)
+        concatenated_clip.close()
         return True
 
     def generate_video(self):
-        video = VideoFileClip(self.video_tmp)
         audio = AudioFileClip(self.audio_tmp)
+        video = VideoFileClip(self.video_tmp)
         if video.duration > audio.duration:
             video = video.subclip(0, int(audio.duration))
         else:
@@ -202,6 +244,7 @@ class CommonGernerateVideo(object):
 
         videos = video.set_audio(audio)
         videos.write_videofile(self.video_name+".mp4", audio_codec='aac')
+        videos.close()
         return True
         
 
@@ -216,9 +259,11 @@ def release_resource():
             os.remove(path)
                 
 def generate_video():
-    video_client = PexelsRestClient()
-    video = CommonGernerateVideo(video_name="mountain lake", videos_client=video_client)
-    video.get_video()
+    # video_client = PexelsRestClient()
+    video_client = PixabayRestClient()
+    #video_client = CoverrRestClient()
+    video = CommonGernerateVideo(video_name="beautiful flower", videos_client=video_client)
+    #video.get_video()
 
     print("正在合成视频中。。。")
     if not video.concatenate_video():
