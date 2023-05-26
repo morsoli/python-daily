@@ -9,6 +9,7 @@
 
 #### 1. [自动生成视频](./mediaprocess/generatevideo.py)
 #### 2. [音频提取字幕](./mediaprocess/audio2text.py)
-#### 3. [音频内容相似性搜索](./embeddings/sbert-base-chinese-nli.py)
+#### 3. [音频内容相似性搜索](./embeddings/)
 #### 4. [个人笔记 QA bot](./chat/)
 #### 5. [体验huggingface模型的基础镜像](./aigc/Dockerfile)
+#### 6. [小红书自动发帖软件](./xiaohs)
