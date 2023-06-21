@@ -92,7 +92,7 @@ def main(url, app_name):
 #     Haishoku.showPalette(path)
 
 if __name__ == "__main__":
-    url = "https://apps.apple.com/cn/app/%E9%A3%9E%E9%B1%BC%E8%AE%A1%E5%88%92-%E6%AF%8F%E4%B8%AA%E4%BA%BA%E7%9A%84%E5%85%A8%E8%83%BD%E8%AE%B0%E5%BD%95%E5%B7%A5%E5%85%B7/id1571229028?platform=iphone"
+    url = "https://apps.apple.com/cn/app/%E5%B0%BD%E7%AE%80%E8%A1%A3%E6%A9%B1-%E8%B6%85%E5%AE%9E%E7%94%A8%E7%9A%84%E8%A1%A3%E6%A9%B1%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/id1344153452?platform=iphone"
     app_name = "focus"
     main(url, app_name)
     

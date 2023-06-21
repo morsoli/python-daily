@@ -1,4 +1,4 @@
- PODCAST_INFO = [
+PODCAST_INFO = [
     {
         "name": "Lex Fridman",
         "description": "麻省理工学院的人工智能专家Lex Fridman和知名科学家、企业家、作家等嘉宾进行深入对话,探讨人工智能、机器人、自动驾驶、生物技术等热门话题。",
@@ -58,11 +58,47 @@ def download_transcript(url):
 def trans_audio_to_text(audio):
     pass
 
-def trans_txt_to_text(txt):
-    pass
-
-def trans_srt_to_text(srt):
-    pass
+def trans_srt_to_text(srt, text):
+    from datetime import datetime
+    # show notes时间戳
+    timestamp_list = ['00:00:00','00:05:14', '00:09:29', '00:11:20', '00:12:27', '00:22:54', '00:26:36', '00:31:10', '00:32:54', '00:36:25', '00:37:54', '00:40:06','00:41:40']
+    with open(srt, "r") as f:
+        srt = f.read()
+    # 分割时间戳和文本
+    segments = srt.split("\n\n")
+    # 分割文本并合并
+    result = []
+    for i in range(len(timestamp_list)):
+        start = datetime.strptime(timestamp_list[i], '%H:%M:%S')
+        if i < len(timestamp_list) - 1:
+            end = datetime.strptime(timestamp_list[i+1], '%H:%M:%S')
+        else:
+            end = datetime.strptime("23:59:59", '%H:%M:%S')
+        segment_text = timestamp_list[i]
+        for j, segment in enumerate(segments):
+            # 获取当前段落的时间戳
+            tmp_str = segment.split("\n")
+            if len(tmp_str) != 3:
+                continue
+            timestamp_str = tmp_str[1].split(" --> ")[0]
+            timestamp_str = timestamp_str.replace(",", ".")
+            timestamp = datetime.strptime(timestamp_str, '%H:%M:%S.%f')
+            if start <= timestamp < end:
+                # 如果在给定的时间戳范围内，则将当前段落添加到结果中
+                segment_text += "," + segment.split("\n")[2]
+            elif timestamp >= end:
+                # 如果当前段落的时间戳大于等于给定的结束时间戳，则将其添加到结果中，并跳出循环
+                result.append(segment_text)
+                break
+        if not result:
+            # 如果结果为空，则将当前段落添加到结果中
+            result.append(segment_text)
+    # 将结果写入文件
+    with open(text, "w") as f:
+        for segment in result:
+            f.write(segment + "\n")
+    # 输出完成消息
+    print("完成！已将结果写入output.txt文件中。")
 
 def trans_english_to_chinese(text):
     pass
